@@ -130,15 +130,20 @@ export default function App() {
   const categories = ['All', 'Academic', 'Administrative', 'Food', 'Service', 'Health'];
 
   // ── Get User Location ──
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
-        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => showToast(t.enableGPS),
-        { enableHighAccuracy: true }
-      );
-    }
-  }, [t.enableGPS]);
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(
+      pos =>
+        setUserLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        }),
+      () => showToast(t.enableGPS),
+      { enableHighAccuracy: true }
+    );
+  }
+}, [t, showToast]);
 
   // ── Inject AR Markers ──
   useEffect(() => {
