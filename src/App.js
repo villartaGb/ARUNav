@@ -138,7 +138,7 @@ export default function App() {
         { enableHighAccuracy: true }
       );
     }
-  }, []);
+  }, [t.enableGPS]);
 
   // ── Inject AR Markers ──
   useEffect(() => {
