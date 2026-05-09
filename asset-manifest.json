@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ARUNav/static/css/main.cbde4803.css",
-    "main.js": "/ARUNav/static/js/main.f942226f.js",
+    "main.js": "/ARUNav/static/js/main.e1769e9d.js",
     "index.html": "/ARUNav/index.html",
     "main.cbde4803.css.map": "/ARUNav/static/css/main.cbde4803.css.map",
-    "main.f942226f.js.map": "/ARUNav/static/js/main.f942226f.js.map"
+    "main.e1769e9d.js.map": "/ARUNav/static/js/main.e1769e9d.js.map"
   },
   "entrypoints": [
     "static/css/main.cbde4803.css",
-    "static/js/main.f942226f.js"
+    "static/js/main.e1769e9d.js"
   ]
 }
