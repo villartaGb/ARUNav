@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 const buildingsData = [
@@ -107,10 +107,10 @@ function dijkstra(buildings, startId, endId) {
   }
 
   const path = [];
-  let current = endId;
-  while (current !== null) {
-    path.unshift(current);
-    current = previous[current];
+  let cur = endId;
+  while (cur !== null) {
+    path.unshift(cur);
+    cur = previous[cur];
   }
   return { path, totalDistance: distances[endId] };
 }
@@ -129,66 +129,69 @@ export default function App() {
   const t = translations[lang];
   const categories = ['All', 'Academic', 'Administrative', 'Food', 'Service', 'Health'];
 
+  // ── Toast ──
+  const showToast = useCallback((message) => {
+    setToast(message);
+    setTimeout(() => setToast(''), 3000);
+  }, []);
+
   // ── Get User Location ──
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(
-      pos =>
-        setUserLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        }),
-      () => showToast(t.enableGPS),
-      { enableHighAccuracy: true }
-    );
-  }
-}, [t, showToast]);
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => showToast("⚠️ Please enable GPS on your device"),
+        { enableHighAccuracy: true }
+      );
+    }
+  }, [showToast]);
 
   // ── Inject AR Markers ──
   useEffect(() => {
-    const scene = document.querySelector('#ar-scene');
-    if (!scene) return;
+    const tryInject = () => {
+      const scene = document.querySelector('#ar-scene');
+      if (!scene) {
+        setTimeout(tryInject, 500);
+        return;
+      }
 
-    document.querySelectorAll('.ar-marker').forEach(el => el.remove());
+      document.querySelectorAll('.ar-marker').forEach(el => el.remove());
 
-    const toRender = activeCategory === 'All'
-      ? buildingsData
-      : buildingsData.filter(b => b.category === activeCategory);
+      const toRender = activeCategory === 'All'
+        ? buildingsData
+        : buildingsData.filter(b => b.category === activeCategory);
 
-    toRender.forEach(b => {
-      const entity = document.createElement('a-entity');
-      entity.classList.add('ar-marker');
-      entity.setAttribute('gps-projected-entity-place',
-        `latitude: ${b.latitude}; longitude: ${b.longitude}`
-      );
-      entity.setAttribute('scale', '15 15 15');
+      toRender.forEach(b => {
+        const entity = document.createElement('a-entity');
+        entity.classList.add('ar-marker');
+        entity.setAttribute('gps-projected-entity-place',
+          `latitude: ${b.latitude}; longitude: ${b.longitude}`
+        );
+        entity.setAttribute('scale', '15 15 15');
 
-      const box = document.createElement('a-box');
-      box.setAttribute('color', categoryColors[b.category] || '#555');
-      box.setAttribute('opacity', '0.85');
-      box.setAttribute('width', '3');
-      box.setAttribute('height', '1');
-      box.setAttribute('depth', '0.2');
+        const box = document.createElement('a-box');
+        box.setAttribute('color', categoryColors[b.category] || '#555');
+        box.setAttribute('opacity', '0.85');
+        box.setAttribute('width', '3');
+        box.setAttribute('height', '1');
+        box.setAttribute('depth', '0.2');
 
-      const text = document.createElement('a-text');
-      text.setAttribute('value', b.name);
-      text.setAttribute('align', 'center');
-      text.setAttribute('color', 'white');
-      text.setAttribute('position', '0 0 0.15');
-      text.setAttribute('width', '3');
+        const text = document.createElement('a-text');
+        text.setAttribute('value', b.name);
+        text.setAttribute('align', 'center');
+        text.setAttribute('color', 'white');
+        text.setAttribute('position', '0 0 0.15');
+        text.setAttribute('width', '3');
 
-      entity.appendChild(box);
-      entity.appendChild(text);
-      entity.addEventListener('click', () => selectBuilding(b));
-      scene.appendChild(entity);
-    });
+        entity.appendChild(box);
+        entity.appendChild(text);
+        entity.addEventListener('click', () => selectBuilding(b));
+        scene.appendChild(entity);
+      });
+    };
+
+    tryInject();
   }, [activeCategory]);
-
-  function showToast(message) {
-    setToast(message);
-    setTimeout(() => setToast(''), 3000);
-  }
 
   function handleSearch(value) {
     setQuery(value);
