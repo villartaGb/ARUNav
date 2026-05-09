@@ -1,5 +1,6 @@
 {
-  "name": "aru-navigator-react",
+  "homepage": "https://villartaGb.github.io/ARUNav",
+  "name": "ARUNav",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
